@@ -120,7 +120,7 @@ export function buildTower(scene){
 
   const glass=towerGlassTextures();
   const glassMat=new THREE.MeshPhysicalMaterial({ map:glass.map, emissiveMap:glass.emissive, emissive:0xffc98f, emissiveIntensity:0.35,
-    color:0xffffff, metalness:0.25, roughness:0.30, envMapIntensity:1.5 });
+    color:0x2a4a68, metalness:0.9, roughness:0.10, envMapIntensity:0.75 }); // deep blue curtain glass: warm sky reflects as a streak, no white wash
   const podGlass=podiumGlassTextures();
   const podiumBaseMat=new THREE.MeshStandardMaterial({ map:podGlass.map, emissiveMap:podGlass.emissive, emissive:0xffa050, emissiveIntensity:0.35,
     color:0xffffff, metalness:0.3, roughness:0.5, envMapIntensity:0.9 });
@@ -180,12 +180,12 @@ export function buildTower(scene){
   mBlock.position.y=baseY['M']+2.1; mBlock.castShadow=true; group.add(mBlock);
 
   // --- real instanced vertical fins on the two long faces (stop before the rounded corner) ---
-  const finGeo=new THREE.BoxGeometry(0.09,1,0.3);
-  const finMat=new THREE.MeshStandardMaterial({color:0xc9a45f,metalness:1.0,roughness:0.35,envMapIntensity:1.2}); // champagne-gold/bronze fins (refs)
+  const finGeo=new THREE.BoxGeometry(0.14,1,0.45); // ~1.5x thicker/deeper so the gold rhythm reads at distance
+  const finMat=new THREE.MeshStandardMaterial({color:0xc9a227,metalness:1.0,roughness:0.35,envMapIntensity:1.2}); // deeper, more saturated champagne-gold (refs)
   const finXf=[];
   for(const [w,d,y0,h] of [[tw6,td6,baseY['6'],baseY['7']-baseY['6']],[tw,td,upperY,upperH]]){
-    for(let x=-w/2+0.4;x<=w/2-8-0.3;x+=1.1) finXf.push([x,y0+h/2, d/2+0.18,h]);   // south face
-    for(let x=-w/2+0.4;x<=w/2-0.4;x+=1.1) finXf.push([x,y0+h/2,-d/2-0.18,h]);     // north face (full width)
+    for(let x=-w/2+0.4;x<=w/2-8-0.3;x+=0.9) finXf.push([x,y0+h/2, d/2+0.22,h]);   // south face, denser spacing
+    for(let x=-w/2+0.4;x<=w/2-0.4;x+=0.9) finXf.push([x,y0+h/2,-d/2-0.22,h]);     // north face (full width)
   }
   const fins=new THREE.InstancedMesh(finGeo,finMat,finXf.length);
   { const d4=new THREE.Object3D();
@@ -330,7 +330,7 @@ export function buildTower(scene){
   // leafy canopy trees: trunk + 3 overlapping foliage spheres, rich green variation
   const leafTrunkGeo=new THREE.CylinderGeometry(0.11,0.19,2.3,6); leafTrunkGeo.translate(0,1.15,0);
   const leafBall=(r,x,y,z)=>{ const s=new THREE.SphereGeometry(r,8,6); s.translate(x,y,z); return s; };
-  const leafCanopyGeo=mergeGeometries([leafBall(1.55,0,3.7,0),leafBall(1.05,1.05,3.0,0.35),leafBall(1.0,-1.0,3.05,-0.3)]);
+  const leafCanopyGeo=mergeGeometries([leafBall(1.6,0,3.75,0),leafBall(1.15,1.25,2.95,0.4),leafBall(1.1,-1.2,3.0,-0.35),leafBall(0.95,0.3,4.4,-0.2)]);
   const leafTrunkMat=new THREE.MeshStandardMaterial({color:0x6e5133,roughness:1});
   const leafCanopyMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1});
   const leafTrunks=new THREE.InstancedMesh(leafTrunkGeo,leafTrunkMat,leafySpots.length);
@@ -382,7 +382,17 @@ export function buildTower(scene){
 // ---------- surroundings ----------
 export function buildSurroundings(scene){
   const g=new THREE.Group();
-  const ground=new THREE.Mesh(new THREE.PlaneGeometry(600,600),new THREE.MeshStandardMaterial({color:0x6f6a5c,roughness:0.9,envMapIntensity:0.35}));
+  // far ground: muted urban grey-green with soft tonal patches + a faint street
+  // grid (canvas tile edges line up into continuous streets when repeated)
+  const groundTex=canvasTex(512,512,(c,w,h)=>{
+    c.fillStyle='#5c6058'; c.fillRect(0,0,w,h);
+    const rnd=mulberry(3);
+    for(let i=0;i<60;i++){ c.fillStyle=rnd()<0.5?'rgba(0,0,0,0.05)':'rgba(255,255,255,0.04)';
+      c.beginPath(); c.ellipse(rnd()*w,rnd()*h,20+rnd()*70,14+rnd()*50,rnd()*3,0,7); c.fill(); }
+    c.fillStyle='rgba(20,22,20,0.16)';
+    c.fillRect(0,0,w,9); c.fillRect(0,0,9,h); c.fillRect(0,h/2-4,w,8); c.fillRect(w/2-4,0,8,h);
+  },8,8);
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(600,600),new THREE.MeshStandardMaterial({map:groundTex,roughness:1,envMapIntensity:0.3}));
   ground.rotation.x=-Math.PI/2; ground.position.y=-0.05; ground.receiveShadow=true; g.add(ground);
   // wet-look boulevard (canvas asphalt with lane dashes)
   const roadTex=canvasTex(256,256,(c,w,h)=>{
@@ -414,8 +424,18 @@ export function buildSurroundings(scene){
   },2,3);
   const ctxMat=new THREE.MeshStandardMaterial({map:ctxTex,roughness:0.8});
   const ctxMat2=new THREE.MeshStandardMaterial({map:ctxTex,color:0xb9c0c4,roughness:0.8});
+  // blue-grey glass variant so the context does not read as one repeated warm box
+  const ctxTexGlass=canvasTex(128,256,(c,w,h)=>{
+    c.fillStyle='#6e7f8d'; c.fillRect(0,0,w,h);
+    const rnd=mulberry(29);
+    for(let y=8;y<h-8;y+=16) for(let x=8;x<w-8;x+=16){
+      c.fillStyle=rnd()<0.18?'rgba(255,180,105,0.85)':'rgba(24,34,46,0.8)'; c.fillRect(x,y,9,10); }
+  },2,3);
+  const ctxGlassMat=new THREE.MeshStandardMaterial({map:ctxTexGlass,metalness:0.35,roughness:0.5,envMapIntensity:0.7});
+  const ctxRnd=mulberry(7); // seeded height jitter 0.75x-1.35x for a less uniform skyline
   [[-90,-20,30,18,22],[95,-35,26,26,18],[-80,55,34,14,20],[90,60,28,20,16],[0,-85,50,22,26],[-120,-70,24,30,14],[120,-80,24,24,20]].forEach((b,i)=>{
-    const m=new THREE.Mesh(new THREE.BoxGeometry(b[2],b[4],b[3]), i%2?ctxMat:ctxMat2); m.position.set(b[0],b[4]/2,b[1]); m.castShadow=true; g.add(m); });
+    const bh=b[4]*(0.75+ctxRnd()*0.6);
+    const m=new THREE.Mesh(new THREE.BoxGeometry(b[2],bh,b[3]), i%3===2?ctxGlassMat:(i%2?ctxMat:ctxMat2)); m.position.set(b[0],bh/2,b[1]); m.castShadow=true; g.add(m); });
   // simple cars: white SUV on the boulevard, dark + red sedans at the drop-off
   function car(color,x,z,rotY,suv=false){
     const carG=new THREE.Group();
@@ -439,13 +459,13 @@ export function buildSurroundings(scene){
   const leafG=new THREE.SphereGeometry(1,8,6), leafM=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1});
   const pos=[]; for(let x=-140;x<=140;x+=14){ if(Math.abs(x)>20) pos.push([x,38]); pos.push([x,58]); }
   const trunks=new THREE.InstancedMesh(trunkG,trunkM,pos.length);
-  const leaves=new THREE.InstancedMesh(leafG,leafM,pos.length*3);
-  const d4=new THREE.Object3D(); const blob=[[0,4.6,0,1.9],[1.1,3.9,0.3,1.3],[-1.0,4.0,-0.3,1.25]];
+  const leaves=new THREE.InstancedMesh(leafG,leafM,pos.length*4);
+  const d4=new THREE.Object3D(); const blob=[[0,4.7,0,1.8],[1.4,3.8,0.5,1.35],[-1.3,3.9,-0.45,1.3],[0.3,5.35,-0.55,1.0]]; // wider-spread 4-blob cluster, no single ball
   const bRnd=mulberry(41), tA=new THREE.Color(0x3e6e35), tB=new THREE.Color(0x5c8a47), tmpC=new THREE.Color();
   pos.forEach((pp,i)=>{ const s=0.8+bRnd()*0.6, tone=bRnd();
     d4.rotation.set(0,bRnd()*Math.PI*2,0); d4.scale.set(s,s,s); d4.position.set(pp[0],1.5*s,pp[1]); d4.updateMatrix(); trunks.setMatrixAt(i,d4.matrix);
-    blob.forEach((b,j)=>{ d4.position.set(pp[0]+b[0]*s,b[1]*s,pp[1]+b[2]*s); const bs=b[3]*s; d4.scale.set(bs,bs,bs); d4.updateMatrix(); leaves.setMatrixAt(i*3+j,d4.matrix);
-      tmpC.lerpColors(tA,tB,Math.min(1,Math.max(0,tone+(bRnd()-0.5)*0.15))); leaves.setColorAt(i*3+j,tmpC); }); });
+    blob.forEach((b,j)=>{ d4.position.set(pp[0]+b[0]*s,b[1]*s,pp[1]+b[2]*s); const bs=b[3]*s; d4.scale.set(bs,bs*0.88,bs); d4.updateMatrix(); leaves.setMatrixAt(i*4+j,d4.matrix);
+      tmpC.lerpColors(tA,tB,Math.min(1,Math.max(0,tone+(bRnd()-0.5)*0.15))); leaves.setColorAt(i*4+j,tmpC); }); });
   trunks.instanceMatrix.needsUpdate=true; leaves.instanceMatrix.needsUpdate=true;
   if(leaves.instanceColor) leaves.instanceColor.needsUpdate=true;
   g.add(trunks,leaves);
