@@ -180,12 +180,12 @@ export function buildTower(scene){
   mBlock.position.y=baseY['M']+2.1; mBlock.castShadow=true; group.add(mBlock);
 
   // --- real instanced vertical fins on the two long faces (stop before the rounded corner) ---
-  const finGeo=new THREE.BoxGeometry(0.14,1,0.45); // ~1.5x thicker/deeper so the gold rhythm reads at distance
+  const finGeo=new THREE.BoxGeometry(0.10,1,0.34); // fine gold lines with the dark glass showing between them (target look)
   const finMat=new THREE.MeshStandardMaterial({color:0xc9a227,metalness:1.0,roughness:0.35,envMapIntensity:1.2}); // deeper, more saturated champagne-gold (refs)
   const finXf=[];
   for(const [w,d,y0,h] of [[tw6,td6,baseY['6'],baseY['7']-baseY['6']],[tw,td,upperY,upperH]]){
-    for(let x=-w/2+0.4;x<=w/2-8-0.3;x+=0.9) finXf.push([x,y0+h/2, d/2+0.22,h]);   // south face, denser spacing
-    for(let x=-w/2+0.4;x<=w/2-0.4;x+=0.9) finXf.push([x,y0+h/2,-d/2-0.22,h]);     // north face (full width)
+    for(let x=-w/2+0.4;x<=w/2-8-0.3;x+=1.05) finXf.push([x,y0+h/2, d/2+0.17,h]);   // south face
+    for(let x=-w/2+0.4;x<=w/2-0.4;x+=1.05) finXf.push([x,y0+h/2,-d/2-0.17,h]);     // north face (full width)
   }
   const fins=new THREE.InstancedMesh(finGeo,finMat,finXf.length);
   { const d4=new THREE.Object3D();
@@ -264,7 +264,7 @@ export function buildTower(scene){
         const frac=k/8, y=zb+frac*(topY-zb);
         const idx=start + fam*frac*NP*0.09 + fam*1.5*Math.sin(frac*5+start); // drift +-9% of perimeter + sine jitter
         const pt=nestPoint(idx, y/podiumH, y);
-        if(prev) nestBeam(prev,pt,0.43,0.26);
+        if(prev) nestBeam(prev,pt,0.37,0.22);
         prev=pt;
       }
     }
@@ -274,14 +274,14 @@ export function buildTower(scene){
     for(let i=0;i<=NP;i++){ const ii=i%NP;
       if(y<nestZBottom(ii)+0.3){ prev=null; continue; } // ring stays above the scalloped bottom edge
       const pt=nestPoint(ii,t,y);
-      if(prev) nestBeam(prev,pt,0.36,0.22);
+      if(prev) nestBeam(prev,pt,0.31,0.19);
       prev=pt;
     }
   }
   const nestGeo=mergeGeometries(nestGeos); nestGeo.computeVertexNormals();
   nestGeos.forEach(g=>g.dispose());
   const nest=new THREE.Mesh(nestGeo, new THREE.MeshStandardMaterial({
-    color:0x8a6844, metalness:0.7, roughness:0.38, emissive:0xffb877, emissiveIntensity:0.04, envMapIntensity:1.0 }));
+    color:0x9b744c, metalness:0.7, roughness:0.38, emissive:0xffb877, emissiveIntensity:0.04, envMapIntensity:1.0 }));
   nest.castShadow=true; nest.receiveShadow=true; group.add(nest);
   // --- garden deck: footprint scaled 1.045 at podium top, under the tree ring/coping ---
   const deck=new THREE.Mesh(footprintGeo(pw*1.045,pd*1.045,6*1.045,0.3),
@@ -382,17 +382,21 @@ export function buildTower(scene){
 // ---------- surroundings ----------
 export function buildSurroundings(scene){
   const g=new THREE.Group();
-  // far ground: muted urban grey-green with soft tonal patches + a faint street
-  // grid (canvas tile edges line up into continuous streets when repeated)
+  // far ground: LIGHT tiled plaza — warm light-grey pavers with subtle per-tile
+  // tone variation and a darker grout grid, repeated into a bright city floor
   const groundTex=canvasTex(512,512,(c,w,h)=>{
-    c.fillStyle='#5c6058'; c.fillRect(0,0,w,h);
-    const rnd=mulberry(3);
-    for(let i=0;i<60;i++){ c.fillStyle=rnd()<0.5?'rgba(0,0,0,0.05)':'rgba(255,255,255,0.04)';
-      c.beginPath(); c.ellipse(rnd()*w,rnd()*h,20+rnd()*70,14+rnd()*50,rnd()*3,0,7); c.fill(); }
-    c.fillStyle='rgba(20,22,20,0.16)';
-    c.fillRect(0,0,w,9); c.fillRect(0,0,9,h); c.fillRect(0,h/2-4,w,8); c.fillRect(w/2-4,0,8,h);
-  },8,8);
-  const ground=new THREE.Mesh(new THREE.PlaneGeometry(600,600),new THREE.MeshStandardMaterial({map:groundTex,roughness:1,envMapIntensity:0.3}));
+    c.fillStyle='#cfc9bd'; c.fillRect(0,0,w,h);
+    const rnd=mulberry(3), T=128; // 4x4 pavers per canvas tile
+    for(let ty=0;ty<4;ty++) for(let tx=0;tx<4;tx++){
+      const v=(rnd()-0.5)*0.08;
+      c.fillStyle=v>0?`rgba(255,250,238,${v})`:`rgba(74,66,54,${-v})`;
+      c.fillRect(tx*T,ty*T,T,T); }
+    for(let i=0;i<40;i++){ c.fillStyle=rnd()<0.5?'rgba(90,82,70,0.05)':'rgba(255,255,255,0.05)';
+      c.beginPath(); c.ellipse(rnd()*w,rnd()*h,20+rnd()*60,14+rnd()*40,rnd()*3,0,7); c.fill(); }
+    c.strokeStyle='rgba(102,95,84,0.55)'; c.lineWidth=3;
+    for(let k=0;k<=4;k++){ c.beginPath(); c.moveTo(k*T,0); c.lineTo(k*T,h); c.moveTo(0,k*T); c.lineTo(w,k*T); c.stroke(); }
+  },40,40);
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(600,600),new THREE.MeshStandardMaterial({map:groundTex,roughness:0.9,envMapIntensity:0.35}));
   ground.rotation.x=-Math.PI/2; ground.position.y=-0.05; ground.receiveShadow=true; g.add(ground);
   // wet-look boulevard (canvas asphalt with lane dashes)
   const roadTex=canvasTex(256,256,(c,w,h)=>{
@@ -406,14 +410,14 @@ export function buildSurroundings(scene){
   road.rotation.x=-Math.PI/2; road.position.set(0,0.01,48); road.receiveShadow=true; g.add(road);
   // light stone plaza + entrance forecourt / drop-off
   const plazaTex=canvasTex(256,256,(c,w,h)=>{
-    c.fillStyle='#d9d2c1'; c.fillRect(0,0,w,h);
+    c.fillStyle='#cfc9bd'; c.fillRect(0,0,w,h);
     const rnd=mulberry(11); for(let i=0;i<500;i++){ c.fillStyle=`rgba(120,105,80,${rnd()*0.08})`; c.fillRect(rnd()*w,rnd()*h,3,3); }
-    c.strokeStyle='#b3a98f'; c.lineWidth=3; c.strokeRect(0,0,w,h); c.beginPath(); c.moveTo(w/2,0); c.lineTo(w/2,h); c.moveTo(0,h/2); c.lineTo(w,h/2); c.stroke();
+    c.strokeStyle='#a29a8a'; c.lineWidth=3; c.strokeRect(0,0,w,h); c.beginPath(); c.moveTo(w/2,0); c.lineTo(w/2,h); c.moveTo(0,h/2); c.lineTo(w,h/2); c.stroke();
   },9,3);
-  const plazaMat=new THREE.MeshStandardMaterial({map:plazaTex,roughness:0.45,envMapIntensity:0.8});
+  const plazaMat=new THREE.MeshStandardMaterial({map:plazaTex,roughness:0.6,envMapIntensity:0.6});
   const plaza=new THREE.Mesh(new THREE.PlaneGeometry(76,24),plazaMat);
   plaza.rotation.x=-Math.PI/2; plaza.position.set(0,0.02,35); plaza.receiveShadow=true; g.add(plaza);
-  const forecourt=new THREE.Mesh(new THREE.PlaneGeometry(64,7.5),new THREE.MeshStandardMaterial({color:0xbfb298,roughness:0.5,envMapIntensity:0.6}));
+  const forecourt=new THREE.Mesh(new THREE.PlaneGeometry(64,7.5),new THREE.MeshStandardMaterial({color:0xcfc9bd,roughness:0.6,envMapIntensity:0.6}));
   forecourt.rotation.x=-Math.PI/2; forecourt.position.set(0,0.025,27); forecourt.receiveShadow=true; g.add(forecourt);
   // context buildings, warmed with a lit-window texture
   const ctxTex=canvasTex(128,256,(c,w,h)=>{

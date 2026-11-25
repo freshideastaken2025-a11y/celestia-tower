@@ -16,7 +16,7 @@ const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
 renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.12;
 renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
-scene.fog=new THREE.Fog(0xe6d7bd,180,420); // golden-hour defaults; applyLighting() below drives every mode
+scene.fog=new THREE.Fog(0xe8d3ac,200,480); // golden-hour defaults; applyLighting() below drives every mode
 // ---------- lighting switcher: gradient sky + sun / hemi / fog / exposure presets ----------
 function makeSky(stops){
   const c=document.createElement('canvas'); c.width=4; c.height=256; const g=c.getContext('2d');
@@ -26,18 +26,19 @@ function makeSky(stops){
   const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
 }
 const LIGHTING={
-  day:      { sky:[[0,'#5f96d8'],[0.55,'#a8c8e8'],[1,'#e8efe9']], fog:[0xdfe8ee,260,650],
+  day:      { sky:[[0,'#5f96d8'],[0.55,'#a8c8e8'],[1,'#e8efe9']], fog:[0xdfe8ee,260,650], bd:0xffffff,
               sun:[0xfff2dd,3.0,[60,120,40]], hemi:[0xcfe5ff,0x77694f,0.85], exposure:1.05 },
-  golden:   { sky:[[0,'#33507a'],[0.5,'#8fb0d0'],[0.72,'#e8a58e'],[0.88,'#ffb46b'],[1,'#ffd9a0']], fog:[0xe6d7bd,180,420],
+  golden:   { sky:[[0,'#33507a'],[0.5,'#8fb0d0'],[0.72,'#e8a58e'],[0.88,'#ffb46b'],[1,'#ffd9a0']], fog:[0xe8d3ac,200,480], bd:0xffe2bb,
               sun:[0xffb46b,2.7,[-85,46,68]], hemi:[0xffd9a8,0x4a3826,0.55], exposure:1.12 },
-  twilight: { sky:[[0,'#0d2142'],[0.45,'#274a75'],[0.75,'#6e4460'],[1,'#e2703a']], fog:[0x2c3a55,170,470],
+  twilight: { sky:[[0,'#0d2142'],[0.45,'#274a75'],[0.75,'#6e4460'],[1,'#e2703a']], fog:[0x2c3a55,170,470], bd:0x93a7cc,
               sun:[0xff8a4a,1.5,[-95,15,60]], hemi:[0x8fa3cc,0x2e2118,0.35], exposure:1.15 },
 };
-let skyTexture=null;
+let skyTexture=null, lightingMode='golden', backdropMat=null;
 function applyLighting(mode){
-  const L=LIGHTING[mode]||LIGHTING.golden;
+  const L=LIGHTING[mode]||LIGHTING.golden; lightingMode=mode;
   if(skyTexture) skyTexture.dispose();
   skyTexture=makeSky(L.sky); scene.background=skyTexture;
+  if(backdropMat) backdropMat.color.set(L.bd);
   scene.fog.color.set(L.fog[0]); scene.fog.near=L.fog[1]; scene.fog.far=L.fog[2];
   sun.color.set(L.sun[0]); sun.intensity=L.sun[1]; sun.position.set(L.sun[2][0],L.sun[2][1],L.sun[2][2]);
   hemi.color.set(L.hemi[0]); hemi.groundColor.set(L.hemi[1]); hemi.intensity=L.hemi[2];
@@ -62,6 +63,35 @@ function makeEnvScene(){
   return es;
 }
 const pmrem=new THREE.PMREMGenerator(renderer); scene.environment=pmrem.fromScene(makeEnvScene(),0.04).texture;
+// ---------- photographic city backdrop (exterior) ----------
+// Open cylinder wrapped in a golden-hour panorama of the surrounding Lahore
+// district: takes over the background role outside (the gradient sky stays
+// behind its top edge), is tinted per lighting preset in applyLighting(), and
+// also drives scene.environment via PMREM so glass/fins reflect the real city.
+// Vertical tuning: cylinder centre raised +36 and texture offset +0.05 so the
+// photo's building bases (v~0.40) land on the ground-plane horizon. (A taller
+// 360 m variant was tried: it curved the top edge visibly through the frame
+// corners, so the 240 m version ships.)
+new THREE.TextureLoader().load('backdrop.jpg',tex=>{
+  tex.colorSpace=THREE.SRGBColorSpace;
+  tex.wrapS=THREE.RepeatWrapping; tex.wrapT=THREE.ClampToEdgeWrapping;
+  tex.repeat.set(2,1); tex.offset.y=0.05; tex.anisotropy=4;
+  // top-edge fade: alphaMap gradient (canvas top row = v=1 = cylinder top with
+  // flipY) easing alpha 0 at the very top to 1 by ~v0.78, so the photo cylinder
+  // dissolves into the gradient sky dome instead of ending in a hard seam.
+  const fc=document.createElement('canvas'); fc.width=2; fc.height=256;
+  const fg=fc.getContext('2d'); const fgr=fg.createLinearGradient(0,0,0,256);
+  fgr.addColorStop(0,'#000000'); fgr.addColorStop(0.12,'#595959'); fgr.addColorStop(0.22,'#ffffff'); fgr.addColorStop(1,'#ffffff');
+  fg.fillStyle=fgr; fg.fillRect(0,0,2,256);
+  const fadeTex=new THREE.CanvasTexture(fc);
+  backdropMat=new THREE.MeshBasicMaterial({map:tex,alphaMap:fadeTex,transparent:true,side:THREE.BackSide,fog:false,depthWrite:false});
+  const bd=new THREE.Mesh(new THREE.CylinderGeometry(380,380,240,64,1,true),backdropMat);
+  bd.position.y=36; bd.renderOrder=-1; scene.add(bd);
+  backdropMat.color.set((LIGHTING[lightingMode]||LIGHTING.golden).bd);
+  const eq=tex.clone(); eq.mapping=THREE.EquirectangularReflectionMapping;
+  eq.repeat.set(1,1); eq.offset.set(0,0); eq.needsUpdate=true;
+  scene.environment=pmrem.fromEquirectangular(eq).texture;
+});
 const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,0.1,1200); camera.position.set(88,18,124);
 // post-processing: bloom for the warm emissives (podium glow, lit windows, LED
 // bands) + OutputPass for ACES tone mapping / sRGB. Disabled on Low quality.
