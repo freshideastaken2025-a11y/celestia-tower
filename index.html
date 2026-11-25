@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Celestia IT &amp; Office Tower — NSIT City, Lahore | CBD Punjab</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--gold:#d8ab5e;--ink:#0b0f16}
+  body{font-family:"Avenir Next","Segoe UI",system-ui,-apple-system,sans-serif;background:var(--ink);color:#fff}
+  a{color:inherit;text-decoration:none}
+  .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  .heroBg{position:absolute;inset:0;background-size:cover;background-position:center 30%;transition:opacity .6s ease}
+  .heroShade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,8,14,.62) 0%,rgba(5,8,14,.25) 45%,rgba(5,8,14,0) 70%),linear-gradient(0deg,rgba(5,8,14,.55),rgba(5,8,14,0) 40%)}
+  .topbar{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:22px 34px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brandMark{width:40px;height:40px;border:1.5px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-family:Georgia,serif;font-size:20px}
+  .brand b{letter-spacing:.34em;font-size:15px}
+  .brand span{display:block;letter-spacing:.24em;font-size:9px;color:#e8ddc8;margin-top:3px}
+  .btn{display:inline-block;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid transparent}
+  .btnGold{background:linear-gradient(180deg,#e9c37c,#cfa14f);color:#23180a}
+  .btnGhost{background:rgba(10,14,22,.45);border-color:rgba(255,255,255,.35);color:#fff;backdrop-filter:blur(6px)}
+  .heroBody{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 34px;max-width:900px}
+  .kicker{letter-spacing:.42em;font-size:11px;color:#f0d9a8;margin-bottom:18px}
+  h1{font-size:clamp(44px,7.2vw,96px);line-height:1.02;font-weight:700;letter-spacing:-.01em;text-shadow:0 2px 30px rgba(0,0,0,.35)}
+  h1 em{font-style:normal;color:var(--gold)}
+  .sub{margin-top:20px;font-size:clamp(15px,1.6vw,19px);color:#f3ead8;max-width:520px;line-height:1.55}
+  .heroCtas{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap}
+  .heroMeta{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;padding:0 34px 18px;gap:16px;flex-wrap:wrap}
+  .chip{background:rgba(8,11,18,.55);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px 14px;font-size:12.5px;backdrop-filter:blur(6px)}
+  .chip small{display:block;color:#cbbd9d;letter-spacing:.18em;font-size:9.5px;margin-bottom:3px}
+  .tag{letter-spacing:.3em;font-size:10px;color:#e8ddc8;border:1px solid rgba(232,221,200,.4);padding:8px 12px;border-radius:6px}
+  .viewbar{position:relative;z-index:3;display:flex;gap:2px;background:rgba(7,10,16,.88);padding:10px 14px;flex-wrap:wrap;align-items:center}
+  .viewbar button{background:transparent;border:0;color:#cfd6df;font-size:14px;padding:10px 16px;border-radius:8px;cursor:pointer}
+  .viewbar button.on{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+  .viewbar .walk{margin-left:auto;color:var(--gold);font-weight:700}
+  section{padding:64px 34px;max-width:1240px;margin:0 auto}
+  .secKick{letter-spacing:.34em;font-size:11px;color:var(--gold);margin-bottom:12px}
+  h2{font-size:clamp(28px,3.6vw,44px);font-weight:700;line-height:1.12}
+  .lead{color:#b9c1cc;margin-top:14px;max-width:640px;line-height:1.65;font-size:16px}
+  .specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:34px}
+  .spec{background:#111826;border:1px solid #1f2a3d;border-radius:14px;padding:20px}
+  .spec b{display:block;font-size:26px;color:#fff}
+  .spec span{color:#93a0b4;font-size:13px;line-height:1.5;display:block;margin-top:6px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:30px}
+  .card{border-radius:16px;overflow:hidden;position:relative;background:#111826;border:1px solid #1f2a3d}
+  .card img{width:100%;height:250px;object-fit:cover;display:block}
+  .card div{padding:16px 18px}
+  .card b{font-size:16px}
+  .card p{color:#93a0b4;font-size:13.5px;margin-top:5px;line-height:1.55}
+  .modelBand{background:linear-gradient(120deg,#141c2c,#0d1320);border:1px solid #24334d;border-radius:20px;padding:38px;display:flex;gap:28px;align-items:center;flex-wrap:wrap}
+  .modelBand p{color:#b9c1cc;line-height:1.65;max-width:560px;margin-top:10px}
+  footer{padding:30px 34px;border-top:1px solid #1c2637;color:#7d8899;font-size:12.5px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  .disc{color:#66707f;font-size:11.5px;max-width:1240px;margin:0 auto;padding:0 34px 40px;line-height:1.6}
+</style></head>
+<body>
+
+<header class="hero">
+  <div class="heroBg" id="heroBg" style="background-image:url('img/celestia-hero-golden.jpg')"></div>
+  <div class="heroShade"></div>
+  <div class="topbar">
+    <div class="brand"><div class="brandMark">C</div><div><b>CELESTIA</b><span>IT &amp; OFFICE TOWER · LAHORE</span></div></div>
+    <a class="btn btnGold" href="#specs">Explore floors</a>
+  </div>
+  <div class="heroBody">
+    <div class="kicker">NSIT SILICON BLOCK · CBD NSIT CITY</div>
+    <h1>A new<br>landmark<br>for the <em>digital<br>age.</em></h1>
+    <p class="sub">A considered place for technology, business and the future of Lahore — G + 19 floors of Grade-A IT offices above a landscaped nest podium, in the STZA-licensed NSIT City.</p>
+    <div class="heroCtas">
+      <a class="btn btnGold" href="showroom/index.html">Walk inside — live 3D&nbsp;&nbsp;↗</a>
+      <a class="btn btnGhost" href="#angles">See every angle</a>
+    </div>
+  </div>
+  <div class="heroMeta">
+    <div class="chip"><small>LOCATION</small>Adjacent to DHA Phase 6 &amp; 7 · Bedian Road, Lahore</div>
+    <div class="tag">ARCHITECTURAL VISUALIZATION</div>
+  </div>
+  <nav class="viewbar" id="viewbar">
+    <button data-view="img/celestia-hero-day.jpg">Day</button>
+    <button data-view="img/celestia-hero-golden.jpg" class="on">Golden hour</button>
+    <button data-view="img/celestia-hero-bluehour.jpg">Blue hour</button>
+    <button data-view="img/celestia-hero-night.jpg">Night</button>
+    <button class="walk" onclick="location.href='showroom/index.html'">● Walk inside</button>
+  </nav>
+</header>
+
+<section id="specs">
+  <div class="secKick">THE BUILDING</div>
+  <h2>Brochure figures, straight from CBD Punjab's own document.</h2>
+  <p class="lead">Plot B-23-01 in the Silicon Block of CBD NSIT City. Grey structure complete. Floor 5 is reserved for tokenization and Floor 10 is the service floor — neither is for sale.</p>
+  <div class="specs">
+    <div class="spec"><b>G + 19 + M</b><span>Storeys over 4 basements · total height 301 ft</span></div>
+    <div class="spec"><b>339,404 sq ft</b><span>Total saleable area · offices from 557 to 6,000 sq ft</span></div>
+    <div class="spec"><b>PKR 40,000</b><span>Starting rate per sq ft (Floors 1–3), rising to 75,000 at Floors 17–19</span></div>
+    <div class="spec"><b>40% down</b><span>10% on possession, then 6 quarterly instalments over 18 months</span></div>
+    <div class="spec"><b>STZA zone</b><span>Licensed tech district · central HVAC · 24/7 power backup · media façade</span></div>
+  </div>
+</section>
+
+<section id="angles">
+  <div class="secKick">EVERY ANGLE</div>
+  <h2>One building, every light of the day.</h2>
+  <div class="grid">
+    <div class="card"><img src="img/celestia-hero-day.jpg" alt="Day"><div><b>Day</b><p>Bright blue sky over the corner plot — deep blue glass, gold fins, the nest in full daylight.</p></div></div>
+    <div class="card"><img src="img/celestia-hero-golden.jpg" alt="Golden hour"><div><b>Golden hour</b><p>Low western sun raking the fins, wet boulevard reflections, the podium glowing from within.</p></div></div>
+    <div class="card"><img src="img/celestia-hero-bluehour.jpg" alt="Blue hour"><div><b>Blue hour</b><p>Twilight blue glass, office lights coming on floor by floor.</p></div></div>
+    <div class="card"><img src="img/celestia-hero-night.jpg" alt="Night"><div><b>Night</b><p>The podium as a lantern — scattered lit windows, headlights on wet asphalt.</p></div></div>
+    <div class="card"><img src="img/celestia-aerial-golden.jpg" alt="Aerial"><div><b>Aerial</b><p>From above: the garden deck and tree canopy carried inside the woven shell, city on every side.</p></div></div>
+    <div class="card"><img src="img/celestia-street-dusk.jpg" alt="Street level"><div><b>Street level — dusk</b><p>At the corner of the two roads, palms at the base, traffic moving past.</p></div></div>
+    <div class="card"><img src="img/celestia-podium-golden.jpg" alt="Podium entrance"><div><b>The entrance</b><p>The nest lifts at the south face — the double-height lobby glowing behind the lattice.</p></div></div>
+    <div class="card"><img src="img/celestia-podium-night.jpg" alt="Podium night"><div><b>Podium — night</b><p>Long-exposure light trails on the wet street, the woven shell lit like a lantern.</p></div></div>
+    <div class="card"><img src="img/celestia-lobby.jpg" alt="Grand lobby"><div><b>Grand lobby</b><p>Double height, walnut and marble, the nest lattice visible through the glass walls.</p></div></div>
+    <div class="card"><img src="img/celestia-terrace.jpg" alt="Garden terrace"><div><b>Garden terrace</b><p>On the podium roof: planters, benches and mature trees above the woven rim.</p></div></div>
+    <div class="card"><img src="img/celestia-office-view.jpg" alt="Office view"><div><b>From the office floor</b><p>Full-height glass, the city below — the working view from a Celestia IT office.</p></div></div>
+    <div class="card"><img src="img/celestia-crown-lookup.jpg" alt="Crown look-up"><div><b>The crown, from below</b><p>Gold fins converging into the sloped glass crown, the nest sweeping the frame's base.</p></div></div>
+    <div class="card"><img src="img/celestia-weave-closeup.jpg" alt="Weave close-up"><div><b>The weave, close up</b><p>Bronze strands over warm stone — the craft of the nest, at arm's length.</p></div></div>
+    <div class="card"><img src="img/celestia-hero-golden.jpg" alt="Live 3D" style="filter:saturate(.4) brightness(.75)"><div><b>Walk inside — live 3D model</b><p>Not a picture: the actual walkable model. Lobby, IT office floor, executive suite and terrace, with the floor &amp; price explorer built in.</p><p style="margin-top:10px"><a class="btn btnGold" href="showroom/index.html">Open the 3D showroom ↗</a></p></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="modelBand">
+    <div>
+      <div class="secKick">LIVE 3D SHOWROOM</div>
+      <h2>Don't just look at it.<br>Walk through it.</h2>
+      <p>First-person walk (WASD + mouse, mobile joystick), six guided tours, day / golden / twilight lighting, and the interactive Floor &amp; Unit Explorer with the official tiered rates and payment plan — the same figures CBD Punjab published.</p>
+    </div>
+    <a class="btn btnGold" href="showroom/index.html" style="font-size:16px;padding:16px 28px">Enter the showroom ↗</a>
+  </div>
+</section>
+
+<p class="disc">Presentation material for Celestia IT &amp; Office Tower, CBD NSIT City, Lahore (developer: PCBDDA / CBD Punjab). Gallery images are architectural visualizations of the design; the walk-in showroom is a real-time 3D model built from the official brochure (plot B-23-01). Interior fit-out shown is indicative. Figures quoted are from the brochure; in case of any revised CBD sheet, the revised sheet prevails.</p>
+<footer><span>CELESTIA · IT &amp; Office Tower · NSIT Silicon Block, Lahore</span><span>Prepared for CBD Punjab presentation</span></footer>
+
+<script>
+  const bg=document.getElementById('heroBg');
+  document.querySelectorAll('#viewbar [data-view]').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#viewbar [data-view]').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    bg.style.opacity=0;
+    const img=new Image(); img.onload=()=>{ bg.style.backgroundImage=`url('${b.dataset.view}')`; bg.style.opacity=1; };
+    img.src=b.dataset.view;
+  });
+</script>
+</body></html>
