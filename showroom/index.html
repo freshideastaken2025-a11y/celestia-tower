@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Celestia IT &amp; Office Tower — NSIT City, Lahore | CBD Punjab</title>
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script></head>
+<body>
+<canvas id="scene"></canvas>
+<header id="topbar">
+  <div class="brand"><strong>CELESTIA</strong><span>IT &amp; Office Tower · NSIT Silicon Block, Lahore</span></div>
+  <div class="topBtns">
+    <button id="infoToggle">ℹ Investor Info</button>
+    <button id="explorerToggle">🏢 Floor Explorer</button>
+    <select id="quality" title="Quality"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select>
+    <select id="lighting" title="Lighting"><option value="day">Day</option><option value="golden" selected>Golden Hour</option><option value="twilight">Twilight</option></select>
+  </div>
+</header>
+
+<aside id="infoPanel" class="panel hidden"><div class="panelHead"><h2>Investor &amp; Customer Info</h2><button onclick="this.closest('.panel').classList.add('hidden')">✕</button></div><div id="infoBody"></div></aside>
+
+<aside id="explorerPanel" class="panel right"><div class="panelHead"><h2>Floor &amp; Unit Explorer</h2><button onclick="this.closest('.panel').classList.add('hidden')">✕</button></div>
+<div id="floorList"></div><div id="floorDetail"><p class="note">Select any floor — B4 to M — to see plate, saleable area, tiered rate, unit prices and the official payment breakdown.</p></div></aside>
+
+<nav id="tourBar"><span>Guided Tours:</span><span id="tourBtns"></span></nav>
+
+<div id="walkBar" class="hidden">
+  <span id="walkLabel">Walk mode — WASD / arrows · mouse look · Shift run · Esc exit</span>
+  <span><button data-walk="lobby">Lobby</button><button data-walk="office">Office (Floor 12)</button><button data-walk="rooftop">Rooftop ⚠ Visualisation</button><button id="exitWalk">Exit Walk</button></span>
+</div>
+<button id="walkFab">🚶 Walk Inside</button>
+<div id="joystick" class="hidden"><div id="joyKnob"></div></div>
+<div id="zoneBadge" class="hidden"></div>
+<script type="module" src="main.js"></script>
+</body></html>
